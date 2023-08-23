@@ -9,11 +9,11 @@ import { ScheduleVisitStyle } from '../scheduleVisitStyle';
 export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh, navigation }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [filters, setFilters] = useState({ visitStatus: null, });
-
+  const [openItemId, setOpenItemId] = useState(null);
   const handleHeaderPress = (item) => {
     setSelectedItem(item.propertyCode === selectedItem?.propertyCode ? null : item);
   };
-
+  
   const toggleItem = (itemId) => {
     if (openItemId === itemId) {
       setOpenItemId(null);
@@ -32,6 +32,7 @@ export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh
     'Tenant denied': 10,
     'CP denied': 11,
     Close: 13,
+    Other:0
   }
   const scheduleVisit = { 'run-time': 1, pending: 2 }
 
@@ -64,18 +65,13 @@ export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh
               {openItemId === item.id && (
                 <View style={ScheduleVisitStyle.card}>
                   <Text style={ScheduleVisitStyle.txtHeading}>ID: {item.id}</Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Date:<Text style={ScheduleVisitStyle.txt}>{moment(item.date).format('DD/MM/YYYY, h:mm a')}</Text> </Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Assigned To:<Text style={ScheduleVisitStyle.txt}>{item.assigned.fullName}</Text> </Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Comment:<Text style={ScheduleVisitStyle.txt}>{item.comment}</Text> </Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Schedule Type</Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Visit Type</Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Channel Partner</Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Visitor<Text>{ }</Text></Text>
+                  <Text style={ScheduleVisitStyle.txtHeading}>Schedule Type <Text style={ScheduleVisitStyle.txt}>{getKeyByValue(EVisitStatus, item.scheduleType)}</Text></Text>
+                  <Text style={ScheduleVisitStyle.txtHeading}>Visit Type <Text style={ScheduleVisitStyle.txt}>{getKeyByValue(EVisitStatus,item.leadVisitType)}</Text></Text>
+                  <Text style={ScheduleVisitStyle.txtHeading}>Visitor<Text style={ScheduleVisitStyle.txt}>{item.contact}</Text></Text>
                   <Text style={ScheduleVisitStyle.txtHeading}>Status:<Text style={ScheduleVisitStyle.txt}>{getKeyByValue(EVisitStatus, item.status)}</Text> </Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>CPRM :<Text style={ScheduleVisitStyle.txt}>{item.cprmUser.fullName}</Text> </Text>
                   <Text style={ScheduleVisitStyle.txtHeading}>Field Officer <Text>{item.assigned.fullName}</Text></Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Created At:<Text style={ScheduleVisitStyle.txt}>{moment(item.createdAt).format('DD/MM/YYYY, h:mm a')}</Text> </Text>
                   <Text style={ScheduleVisitStyle.txtHeading}>Created By :<Text style={ScheduleVisitStyle.txt}>{item.createdByUser.fullName}</Text> </Text>
+                  <Text style={ScheduleVisitStyle.txtHeading}>Created At:<Text style={ScheduleVisitStyle.txt}>{moment(item.createdAt).format('DD/MM/YYYY, h:mm a')}</Text> </Text>
                 </View>
               )}
             </View>

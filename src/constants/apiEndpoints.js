@@ -13,9 +13,10 @@ export const API_ENDPOINTS = {
   // LOGINbyOTP: API_ENDPOINT_BASE_URL + "/otp/send/",
   OTP: API_ENDPOINT_BASE_URL + "/otp",
   Registration: API_ENDPOINT_BASE_URL + "/cpuser",
-
+  
   // Allvisit: API_ENDPOINT_BASE_URL + "/property-schedule",
   ScheduleVisit: API_ENDPOINT_BASE_URL + "/property-schedule/cpvisits",
+  FilterVisitSchedule: API_ENDPOINT_BASE_URL + "/property-schedule?filter=",
  
   
   LOGOUT: API_ENDPOINT_BASE_URL + "/v1/api/logout",

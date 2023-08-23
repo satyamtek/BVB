@@ -6,8 +6,8 @@ import SignUpScreen from '../module/auth/signUp/SignUp.Screen';
 import LoginScreen from '../module/auth/signIn/Login.Screen';
 import ScheduleVisit from '../module/scheduleVisit/Schedule';
 import OTPscreens from '../module/auth/otp/OTP.screen';
-// import { State } from 'react-native-gesture-handler';
 import Filter from '../module/scheduleVisit/Filter';
+// import { State } from 'react-native-gesture-handler';
 
 
 const Stack = createNativeStackNavigator();
@@ -17,7 +17,7 @@ export default function AppNavigation() {
     <NavigationContainer>
       {/* <Stack.Navigator initialRouteName="LoginScreen" >   */}
       <Stack.Navigator  >
-        <Stack.Screen
+      <Stack.Screen
           name="ScheduleVisit"
           component={ScheduleVisit}
         />
@@ -39,9 +39,9 @@ export default function AppNavigation() {
           component={ScheduleVisit}
         /> */}
         <Stack.Screen
-          name="Filter"
+          name='Filter'
           component={Filter}
-        />
+          options={{ headerShown: false }} />
         <Stack.Screen
           name='SignUpScreen'
           component={SignUpScreen}

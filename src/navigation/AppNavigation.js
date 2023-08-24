@@ -28,6 +28,7 @@ export default function AppNavigation() {
             headerTintColor: '#fff',
             headerTitleStyle: { fontWeight: 'bold', },
           }} />
+          
         {/* <Stack.Screen
           name="ScheduleVisit"
           component={ScheduleVisit}

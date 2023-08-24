@@ -17,17 +17,11 @@ export default function AppNavigation() {
     <NavigationContainer>
       {/* <Stack.Navigator initialRouteName="LoginScreen" >   */}
       <Stack.Navigator  >
-      <Stack.Screen
-          name="ScheduleVisit"
-          component={ScheduleVisit}
-        />
-        <Stack.Screen
-          name='LoginScreen'
-          component={LoginScreen}
-          options={{ headerShown: false }} />
+        <Stack.Screen name='Filter' component={Filter} />
+        <Stack.Screen name="ScheduleVisit" component={ScheduleVisit} />
+        <Stack.Screen name='LoginScreen' component={LoginScreen} options={{ headerShown: false }} />
 
-        <Stack.Screen
-          name='OTPscreen'
+        <Stack.Screen name='OTPscreen'
           component={OTPscreens} options={{
             title: '   OTP ',
             headerStyle: { backgroundColor: '#174296', },
@@ -38,12 +32,11 @@ export default function AppNavigation() {
           name="ScheduleVisit"
           component={ScheduleVisit}
         /> */}
-        <Stack.Screen
+        {/* <Stack.Screen
           name='Filter'
           component={Filter}
-          options={{ headerShown: false }} />
-        <Stack.Screen
-          name='SignUpScreen'
+          options={{ headerShown: false }} /> */}
+        <Stack.Screen name='SignUpScreen'
           component={SignUpScreen}
           options={{
             title: 'Registration',

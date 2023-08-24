@@ -3,16 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, RefreshControl, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import moment from 'moment';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/FontAwesome';
+// import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScheduleVisitStyle } from '../scheduleVisitStyle';
 
 export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh, navigation }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [filters, setFilters] = useState({ visitStatus: null, });
   const [openItemId, setOpenItemId] = useState(null);
-  const handleHeaderPress = (item) => {
-    setSelectedItem(item.propertyCode === selectedItem?.propertyCode ? null : item);
-  };
+
+  const handleHeaderPress = (item) => {setSelectedItem(item.propertyCode === selectedItem?.propertyCode ? null : item);};
   
   const toggleItem = (itemId) => {
     if (openItemId === itemId) {
@@ -40,12 +39,12 @@ export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh
 
   return (
     <View style={ScheduleVisitStyle.container} >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 36, fontWeight: '600', margin: 16, textAlign: 'center' }}>Schedule Visit</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Filter', { name: 'Performance', })}>
+        <TouchableOpacity onPress={() => navigation.navigate("Filter")}>
           <Icon name="filter" size={60} color="#ff80d5" />
         </TouchableOpacity>
-      </View>
+      </View> */}
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {loading ? (
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -79,9 +78,12 @@ export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh
         ) : (<Text style={{ textAlign: 'center', marginTop: 51, fontSize: 25, fontWeight: '500' }}> No Visit Assigned </Text>
         )}
       </ScrollView>
-
     </View>
   )
 }
+
+
+
+
 
 

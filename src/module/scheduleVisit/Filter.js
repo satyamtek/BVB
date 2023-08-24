@@ -5,20 +5,20 @@ import { RadioButton } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_ENDPOINTS } from '../../constants';
 
-export default Filter = ({ navigation, route }) => {
+const Filter = ({ navigation, route }) => {
     const [fromDate, setFromDate] = useState(new Date());
     const [toDate, setToDate] = useState(new Date());
     const [radioValue, setRadioValue] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDateField, setSelectedDateField] = useState(null);
     const [showRadioOptions, setShowRadioOptions] = useState(false);
-    // const [isModalVisible, setIsModalVisible] = useState(false);  
     const [data, setData] = useState(null);
     const [token, setToken] = useState(null);
     // console.log(data)
+    
     const radioOptions = [
-        { label: 'Accept', value: 'accept' },
-        { label: 'Deny', value: 'deny' },
+        { label: 'Accept', value: '1' },
+        { label: 'Deny', value: '0' },
     ];
 
     const handleDateChange = (event, selectedDate) => {
@@ -52,20 +52,21 @@ export default Filter = ({ navigation, route }) => {
         console.log('Submitted data:', filterData);
     };
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const storedToken = await AsyncStorage.getItem('token');
-    //             setToken(storedToken);
-    //             if (storedToken) {
-    //                 handleSubmit(storedToken);
-    //             }
-    //         } catch (error) { console.error(error); }
-    //     };
-    //     fetchData();
-    //     // const interval = setInterval(fetchData, 900000);
-    //     // return () => clearInterval(interval);
-    // }, []);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const storedToken = await AsyncStorage.getItem('token');
+                setToken(storedToken);
+                if (storedToken) {
+                    handleSubmit(storedToken);
+                }
+            } catch (error) { console.error(error); }
+        };
+        fetchData();
+        // const interval = setInterval(fetchData, 900000);
+        // return () => clearInterval(interval);
+    
+    }, []);
 
     // const handleSubmit = async (token) => {
     //     const filterData = {
@@ -87,24 +88,27 @@ export default Filter = ({ navigation, route }) => {
     //         const result = await response.json();
     //         //   console.log('result  ',result)
     //         setData(result);
-    //         //   console.log('setdata   ',setData)
     //     } catch (error) { console.error('Error fetching data:', error); }
     // };
+
     useEffect(() => { if (token) { handleSubmit(token); } }, [token]);
     const handleSubmit = async () => {
         // Construct the query parameters
-        const queryParams = new URLSearchParams({
+        // const queryParams = new URLSearchParams({
+            const filter=({
           fromDate: fromDate.toISOString(),
           toDate: toDate.toISOString(),
-          radioValue: radioValue,
+          isAccepted: radioValue,
         });
-      
+        
         try {
           const storedToken = await AsyncStorage.getItem('token');
           setToken(storedToken);
       
           if (storedToken) {
-            const response = await fetch(`${API_ENDPOINTS.FilterVisitSchedule}?${queryParams}`, {
+            console.log(API_ENDPOINTS.FilterVisitSchedule+JSON.stringify(filter))
+            // const response = await fetch(`${API_ENDPOINTS.FilterVisitSchedule}${queryParams}`, {
+            const response = await fetch(API_ENDPOINTS.FilterVisitSchedule+JSON.stringify(filter), {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -247,7 +251,7 @@ const styles = StyleSheet.create({
     },
 });
 
-
+export default Filter
 
 
 

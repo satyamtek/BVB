@@ -29,14 +29,8 @@ export default function AppNavigation() {
             headerTitleStyle: { fontWeight: 'bold', },
           }} />
           
-        {/* <Stack.Screen
-          name="ScheduleVisit"
-          component={ScheduleVisit}
-        /> */}
-        {/* <Stack.Screen
-          name='Filter'
-          component={Filter}
-          options={{ headerShown: false }} /> */}
+        {/* <Stack.Screen name="ScheduleVisit" component={ScheduleVisit}/>
+        <Stack.Screen name='Filter' component={Filter}/> */}
         <Stack.Screen name='SignUpScreen'
           component={SignUpScreen}
           options={{

@@ -1,6 +1,7 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Modal, Pressable, Button } from 'react-native';
 import { API_ENDPOINTS } from '../../constants';
 import { ScheduleVisitStyle } from './scheduleVisitStyle';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,26 +9,29 @@ import { ScheduleVisitBody } from './components';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RadioButton } from 'react-native-paper';
 
-
 const ScheduleVisit = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [token, setToken] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-
-  const [fromDate, setFromDate] = useState(new Date());
-  const [toDate, setToDate] = useState(new Date());
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showRadioOptions, setShowRadioOptions] = useState(false);
   const [radioValue, setRadioValue] = useState(null);
+  const [toDate, setToDate] = useState(new Date());
+  const [fromDate, setFromDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDateField, setSelectedDateField] = useState(null);
-  const [showRadioOptions, setShowRadioOptions] = useState(false);
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+console.log('data responce ',data)
   const radioOptions = [
-    { label: 'Accept', value: 'accept' },
-    { label: 'Deny', value: 'deny' },
+    { label: 'Accept', value: '1' },
+    { label: 'Deny', value: '0' },
   ];
+  const handleRadioSelect = (value) => {
+    setRadioValue(value);
+    // setShowRadioOptions(false);
+  };
 
+  const handleRadioToggle = () => { setShowRadioOptions(!showRadioOptions); };
 
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(Platform.OS === 'ios');
@@ -43,42 +47,6 @@ const ScheduleVisit = ({ navigation }) => {
     setShowDatePicker(true);
   };
 
-  const handleRadioToggle = () => {
-    setShowRadioOptions(!showRadioOptions);
-  };
-
-  const handleRadioSelect = (value) => {
-    setRadioValue(value);
-    // setShowRadioOptions(false);
-  };
-
-  const handleSubmit = () => {
-    const filterData = {
-      fromDate: fromDate.toISOString(),
-      toDate: toDate.toISOString(),
-      radioValue: radioValue,
-    };
-    console.log('Submitted data:', filterData);
-  };
-
-  // const [modalVisible, setModalVisible] = useState(false);
-  // const [selectedFromDate, setSelectedFromDate] = useState(new Date());
-  // const [selectedToDate, setSelectedToDate] = useState(new Date());
-  // const [acceptDeny, setAcceptDeny] = useState('accept');
-  // const [showFromDatePicker, setShowFromDatePicker] = useState(false);
-  // const [showToDatePicker, setShowToDatePicker] = useState(false);
-
-  // const handleFromDateChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || selectedFromDate;
-  //   setShowFromDatePicker(false);
-  //   setSelectedFromDate(currentDate);
-  // };
-  // const handleToDateChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || selectedToDate;
-  //   setShowToDatePicker(false);
-  //   setSelectedToDate(currentDate);
-  // };
-
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -91,6 +59,7 @@ const ScheduleVisit = ({ navigation }) => {
       setRefreshing(false);
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -107,10 +76,84 @@ const ScheduleVisit = ({ navigation }) => {
   }, []);
 
   useEffect(() => { if (token) { scheduleAPI(token); } }, [token]);
-
   const scheduleAPI = async (token) => {
+    const st = new Date();
+    st.setHours(0, 0, 0, 0);
+    const et = new Date();
+    et.setDate(et.getDate() + 1);
+    et.setHours(0, 0, 0, 0);
+    const compare = { between: [st.toISOString(), et.toISOString()] };
+    const filter = {
+      where: {
+        and:
+          radioValue != null ? [{ isAccepted: radioValue },
+          {
+            date: {
+              between: [
+                `${fromDate.toISOString()}`,
+                `${toDate.toISOString()}`
+              ]
+            }
+          }] : [{
+            date: {
+              between: [
+                `${fromDate.toISOString()}`,
+                `${toDate.toISOString()}`
+              ]
+            }
+          }
+          ]
+      },
+      include: [
+        { "relation": "cprmUser", "scope": { "fields": { "id": true, "firstName": true, "lastName": true, "fullName": true } } },
+        {
+          "relation": "cpUser",
+          "scope": {
+            "fields": {
+              "id": true,
+            }
+          }
+        },
+        {
+          "relation": "assigned",
+          "scope": {
+            "fields": {
+              "id": true,
+              "fullName": true
+            }
+          }
+        },
+        {
+          "relation": "createdByUser",
+          "scope": {
+            "fields": {
+              "id": true,
+              "fullName": true,
+              "firstName": true,
+              "lastName": true
+            }
+          }
+        },
+        {
+          "relation": "contact",
+          "scope": {
+            "fields": {
+              "id": true,
+              "firstName": true,
+              'lastName': true,
+              "fullName": true
+            }
+          }
+        },
+        {
+          "relation": "property"
+        }
+      ],
+    };
     try {
-      const response = await fetch(API_ENDPOINTS.ScheduleVisit, {
+      console.log(111,API_ENDPOINTS.ScheduleVisit + JSON.stringify(filter))
+
+      const response = await fetch(API_ENDPOINTS.ScheduleVisit + JSON.stringify(filter), {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
@@ -118,95 +161,179 @@ const ScheduleVisit = ({ navigation }) => {
       });
       const result = await response.json();
       setData(result);
+      console.log("result  \n", result)
     } catch (error) { console.error('Error fetching data:', error); }
     finally { setLoading(false); }
   };
 
-  // const Radio = ({ selected, onPress }) => (
-  //   <TouchableOpacity onPress={onPress} style={{ marginHorizontal: 5 }}>
-  //     <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: 'black', alignItems: 'center', justifyContent: 'center' }}>
-  //       {selected && <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'black' }} />}
-  //     </View>
-  //   </TouchableOpacity>
-  // );
+  // return this.propertyScheduleRepository.find({
+  //   include: [
+  //     { relation: 'cprmUser', scope: { fields: { id: true, firstName: true, lastName: true, fullName: true } } },
+  //     { relation: 'cpUser', scope: { fields: { id: true } } },
+  //     { relation: 'assigned', scope: { fields: { id: true, fullName: true } } },
+  //     {
+  //       relation: 'createdByUser',
+  //       scope: { fields: { id: true, fullName: true, firstName: true, lastName: true } },
+  //     },
+  //     {
+  //       relation: 'contact',
+  //       scope: { fields: { id: true, firstName: true, lastName: true, fullName: true } },
+  //     },
+  //     { relation: 'property' },
+  //   ],
+  // });
+
+
+  // const filterData = () => {
+  //   const st = new Date();
+  //   st.setHours(0, 0, 0, 0);
+  //   const et = new Date();
+  //   et.setDate(et.getDate() + 1);
+  //   et.setHours(0, 0, 0, 0);
+  //   const compare = { between: [st.toISOString(), et.toISOString()] };
+  //   return this.propertyScheduleRepository.find({
+  //     include: [
+  //       { "relation": "cprmUser", "scope": { "fields": { "id": true, "firstName": true, "lastName": true, "fullName": true } } },
+  //       {
+  //         "relation": "cpUser",
+  //         "scope": {
+  //           "fields": {
+  //             "id": true,
+  //           }
+  //         }
+  //       },
+  //       {
+  //         "relation": "assigned",
+  //         "scope": {
+  //           "fields": {
+  //             "id": true,
+  //             "fullName": true
+  //           }
+  //         }
+  //       },
+  //       {
+  //         "relation": "createdByUser",
+  //         "scope": {
+  //           "fields": {
+  //             "id": true,
+  //             "fullName": true,
+  //             "firstName": true,
+  //             "lastName": true
+  //           }
+  //         }
+  //       },
+  //       {
+  //         "relation": "contact",
+  //         "scope": {
+  //           "fields": {
+  //             "id": true,
+  //             "firstName": true,
+  //             'lastName': true,
+  //             "fullName": true
+  //           }
+  //         }
+  //       },
+  //       {
+  //         "relation": "property"
+  //       }
+  //     ],
+  //   });
+  // }
 
 
   return (
     <SafeAreaView style={ScheduleVisitStyle.container}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text style={{ fontSize: 36, fontWeight: '600', margin: 16, textAlign: 'center' }}>Schedule Visit</Text>
-        {/* <TouchableOpacity onPress={() => navigation.navigate("Filter")}> */}
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('Filter')}>
           <Icon name="filter" size={60} color="#ff80d5" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <Pressable
+          style={[styles.button, styles.buttonOpen]}
+          onPress={() => setModalVisible(true)}>
+          <Icon name="filter" size={60} color="#ff80d5" />
+        </Pressable>
       </View>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={{ backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginTop: 21 }}>
 
-          <View style={styles.radioContainer}>
-            {(
-              <View style={styles.radioOptions}>
-                {radioOptions.map((option, index) => (
-                  <RadioButton.Item
-                    key={index}
-                    label={option.label}
-                    value={option.value}
-                    status={radioValue === option.value ? 'checked' : 'unchecked'}
-                    onPress={() => handleRadioSelect(option.value)}
-                  />
-                ))}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Hello World!</Text>
+              <View style={styles.radioContainer}>
+                {(
+                  <View style={styles.radioOptions}>
+                    {radioOptions.map((option, index) => (
+                      <RadioButton.Item
+                        key={index}
+                        label={option.label}
+                        value={option.value}
+                        status={radioValue === option.value ? 'checked' : 'unchecked'}
+                        onPress={() => handleRadioSelect(option.value)}
+                      />
+                    ))}
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-          <Text style={{ fontSize: 21, right: 0 }}>Created At Date</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-            <View style={{ margin: 11, }}>
-              <TouchableOpacity onPress={() => showDatepicker('toDate')}>
-                <Text>From Date:</Text>
-                <Text> {toDate.toDateString()}</Text>
-              </TouchableOpacity>
-            </View>
 
-            <View style={{ margin: 11, }}>
-              <TouchableOpacity onPress={() => showDatepicker('fromDate')}>
-                <View style={{ borderRadius: 11, borderColor: '#001a1a' }}>
-
-                  <Text>To Date: </Text>
-                  <Text>{fromDate.toDateString()}</Text>
+              {/* CALENDER CODE  */}
+              <Text style={{ fontSize: 21, right: 0 }}>Created At Date</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 11 }}>
+                <View style={{ margin: 11, }}>
+                  <TouchableOpacity onPress={() => showDatepicker('toDate')}>
+                    <Text>From Date:</Text>
+                    <Text> {toDate.toDateString()}</Text>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
+
+                <View style={{ margin: 11, }}>
+                  <TouchableOpacity onPress={() => showDatepicker('fromDate')}>
+                    <View style={{ borderRadius: 11, borderColor: '#001a1a' }}>
+                      <Text>To Date: </Text>
+                      <Text>{fromDate.toDateString()}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDateField === 'fromDate' ? fromDate : toDate}
+                  mode="date"
+                  display="default"
+                  onChange={handleDateChange}
+                />
+              )}
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={()=>[scheduleAPI, setModalVisible(false)]}>
+                  {/* onPress={() => setModalVisible(!modalVisible)}> */}
+                  <Text style={styles.textStyle}>Submit</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
-
-        </View>
-      </Modal>
-      {/* <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.centeredView}>
-          <TouchableOpacity onPress={() => setShowFromDatePicker(true)}>
-            <Text>Select From Date: {selectedFromDate.toLocaleDateString()}</Text>
-          </TouchableOpacity>
-          {showFromDatePicker && (
-            <DateTimePicker
-              value={selectedFromDate}
-              mode="date"
-              display="default"
-              onChange={handleFromDateChange}
-            />
-          )}
-          <TouchableOpacity onPress={() => setShowToDatePicker(true)}>
-            <Text>Select To Date: {selectedToDate.toLocaleDateString()}</Text>
-          </TouchableOpacity>
-          {showToDatePicker && (
-            <DateTimePicker
-              value={selectedToDate}
-              mode="date"
-              display="default"
-              onChange={handleToDateChange}
-            />
-          )}
-        </View>
-      </Modal> */}
-
+        </Modal>
+        <Pressable
+          style={[styles.button, styles.buttonOpen]}
+          onPress={() => setModalVisible(true)}>
+          <Icon name="filter" size={60} color="#ff80d5" />
+        </Pressable>
+      </View>
 
       <ScheduleVisitBody data={data} loading={loading} refreshing={refreshing} onRefresh={onRefresh} />
     </SafeAreaView>
@@ -214,17 +341,15 @@ const ScheduleVisit = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  modalContainer: {
+  centeredView: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    marginTop: 21,
+    marginTop: 22,
+
   },
   modalView: {
-    margin: 20,
+    width: '80%', height: '60%',
+    margin: '21%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -244,28 +369,29 @@ const styles = StyleSheet.create({
   radioOptions: {
     flexDirection: 'row'
   },
-  radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  submitButton: {
-    backgroundColor: '#ccffff',
+  button: {
+    borderRadius: 20,
     padding: 10,
-    alignItems: 'center',
-    borderRadius: 5,
-    marginTop: 20,
-    marginRight: 21,
+    elevation: 2,
+    marginBottom: 23,
   },
-  submitButton1: {
-    backgroundColor: '#f2f2f2',
-    padding: 10,
-    alignItems: 'center',
-    borderRadius: 5,
-    marginTop: 20,
-    marginLeft: 21,
+  buttonOpen: {
+    // backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
+
 export default ScheduleVisit;
 
 

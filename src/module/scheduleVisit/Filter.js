@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -92,8 +94,8 @@ const Filter = ({ navigation, route }) => {
     // };
 
     useEffect(() => { if (token) { handleSubmit(token); } }, [token]);
+    
     const handleSubmit = async () => {
-        // Construct the query parameters
         // const queryParams = new URLSearchParams({
         const filter = {
             where: {
@@ -111,160 +113,217 @@ const Filter = ({ navigation, route }) => {
             }
         };
 
-            try {
-                const storedToken = await AsyncStorage.getItem('token');
-                setToken(storedToken);
-      
-          if(storedToken) {
-                    console.log(API_ENDPOINTS.FilterVisitSchedule + JSON.stringify(filter))
-                    // const response = await fetch(`${API_ENDPOINTS.FilterVisitSchedule}${queryParams}`, {
-                    const response = await fetch(API_ENDPOINTS.FilterVisitSchedule + JSON.stringify(filter), {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: 'Bearer ' + storedToken,
-                        },
-                    });
+        try {
+            const storedToken = await AsyncStorage.getItem('token');
+            setToken(storedToken);
 
-                    if (response.ok) {
-                        const result = await response.json();
-                        setData(result);
-                        console.log(token)
-                    } else {
-                        // Handle error case
-                        console.error('API call failed:', response.status, response.statusText);
-                    }
+            if (storedToken) {
+                console.log(API_ENDPOINTS.FilterVisitSchedule + JSON.stringify(filter))
+                // const response = await fetch(`${API_ENDPOINTS.FilterVisitSchedule}${queryParams}`, {
+                const response = await fetch(API_ENDPOINTS.FilterVisitSchedule + JSON.stringify(filter), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + storedToken,
+                    },
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    setData(result);
+                    console.log(111,token)
+                } else {
+                    // Handle error case
+                    console.error('API call failed:', response.status, response.statusText);
                 }
-            } catch(error) {
-                console.error('Error fetching data:', error);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
 
 
-        return (
+    return (
+        <View style={styles.modalContainer}>
             <View style={styles.modalContainer}>
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalView}>
+                <View style={styles.modalView}>
 
-                        <View style={styles.radioContainer}>
-                            {(
-                                <View style={styles.radioOptions}>
-                                    {radioOptions.map((option, index) => (
-                                        <RadioButton.Item
-                                            key={index}
-                                            label={option.label}
-                                            value={option.value}
-                                            status={radioValue === option.value ? 'checked' : 'unchecked'}
-                                            onPress={() => handleRadioSelect(option.value)}
-                                        />
-                                    ))}
-                                </View>
-                            )}
-                        </View>
-
-                        <Text style={{ fontSize: 21, right: 0 }}>Created At Date</Text>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                            <View style={{ margin: 11, }}>
-                                <TouchableOpacity onPress={() => showDatepicker('toDate')}>
-                                    <Text>From Date:</Text>
-                                    <Text> {toDate.toDateString()}</Text>
-                                </TouchableOpacity>
+                    {/* RADIO BUTTON CODE  */}
+                    <View style={styles.radioContainer}>
+                        {(
+                            <View style={styles.radioOptions}>
+                                {radioOptions.map((option, index) => (
+                                    <RadioButton.Item
+                                        key={index}
+                                        label={option.label}
+                                        value={option.value}
+                                        status={radioValue === option.value ? 'checked' : 'unchecked'}
+                                        onPress={() => handleRadioSelect(option.value)}
+                                    />
+                                ))}
                             </View>
-
-                            <View style={{ margin: 11, }}>
-                                <TouchableOpacity onPress={() => showDatepicker('fromDate')}>
-                                    <View style={{ borderRadius: 11, borderColor: '#001a1a' }}>
-
-                                        <Text>To Date: </Text>
-                                        <Text>{fromDate.toDateString()}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
-                        {showDatePicker && (
-                            <DateTimePicker
-                                value={selectedDateField === 'fromDate' ? fromDate : toDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleDateChange}
-                            />
                         )}
+                    </View>
 
-                        <View style={{ flexDirection: 'row', margin: 11, }}>
-                            {/* <TouchableOpacity style={styles.submitButton} onPress={() => { handleSubmit(); setIsModalVisible(false); }}> */}
-                            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                                <Text>Submit</Text>
+                    {/* CALENDER CODE  */}
+                    <Text style={{ fontSize: 21, right: 0 }}>Created At Date</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                        <View style={{ margin: 11, }}>
+                            <TouchableOpacity onPress={() => showDatepicker('toDate')}>
+                                <Text>From Date:</Text>
+                                <Text> {toDate.toDateString()}</Text>
                             </TouchableOpacity>
+                        </View>
 
-                            <TouchableOpacity style={styles.submitButton1} onPress={() => navigation.navigate('ScheduleVisit')}>
-                                {/* <TouchableOpacity style={styles.submitButton1} onPress={() => { setIsModalVisible(false) }}> */}
-                                <Text>Cancel</Text>
+                        <View style={{ margin: 11, }}>
+                            <TouchableOpacity onPress={() => showDatepicker('fromDate')}>
+                                <View style={{ borderRadius: 11, borderColor: '#001a1a' }}>
+                                    <Text>To Date: </Text>
+                                    <Text>{fromDate.toDateString()}</Text>
+                                </View>
                             </TouchableOpacity>
                         </View>
                     </View>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={selectedDateField === 'fromDate' ? fromDate : toDate}
+                            mode="date"
+                            display="default"
+                            onChange={handleDateChange}
+                        />
+                    )}
+
+                    {/* SUBMIT DATA CODE  */}
+                    <View style={{ flexDirection: 'row', margin: 11, }}>
+                        {/* <TouchableOpacity style={styles.submitButton} onPress={() => { handleSubmit(); setIsModalVisible(false); }}> */}
+                        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                            <Text>Submit</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.submitButton1} onPress={() => navigation.navigate('ScheduleVisit')}>
+                            {/* <TouchableOpacity style={styles.submitButton1} onPress={() => { setIsModalVisible(false) }}> */}
+                            <Text>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
-            </View >
-        );
-    };
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
+            </View>
+        </View >
+    );
+};
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        marginTop: 21,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
         },
-        modalContainer: {
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-            marginTop: 21,
-        },
-        modalView: {
-            margin: 20,
-            backgroundColor: 'white',
-            borderRadius: 20,
-            padding: 35,
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: {
-                width: 0,
-                height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
-            elevation: 5,
-        },
-        radioContainer: {
-            marginTop: 20,
-        },
-        radioOptions: {
-            flexDirection: 'row'
-        },
-        radioButton: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 10,
-        },
-        submitButton: {
-            backgroundColor: '#ccffff',
-            padding: 10,
-            alignItems: 'center',
-            borderRadius: 5,
-            marginTop: 20,
-            marginRight: 21,
-        },
-        submitButton1: {
-            backgroundColor: '#f2f2f2',
-            padding: 10,
-            alignItems: 'center',
-            borderRadius: 5,
-            marginTop: 20,
-            marginLeft: 21,
-        },
-    });
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    radioContainer: {
+        marginTop: 20,
+    },
+    radioOptions: {
+        flexDirection: 'row'
+    },
+    radioButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    submitButton: {
+        backgroundColor: '#ccffff',
+        padding: 10,
+        alignItems: 'center',
+        borderRadius: 5,
+        marginTop: 20,
+        marginRight: 21,
+    },
+    submitButton1: {
+        backgroundColor: '#f2f2f2',
+        padding: 10,
+        alignItems: 'center',
+        borderRadius: 5,
+        marginTop: 20,
+        marginLeft: 21,
+    },
+});
 
-    export default Filter
+export default Filter
 
-
-
+/*
+const st = new Date();
+st.setHours(0, 0, 0, 0);
+const et = new Date();
+et.setDate(et.getDate() + 1);
+et.setHours(0, 0, 0, 0);
+const compare = { between: [st.toISOString(), et.toISOString()] };
+let f=await this.propertyScheduleRepository.find(filter);
+return await this.propertyScheduleRepository.find({
+  include: [
+    { "relation": "cprmUser", "scope": { "fields": { "id": true, "firstName": true, "lastName": true, "fullName": true } } },
+    {
+      "relation": "cpUser",
+      "scope": {
+        "fields": {
+          "id": true,
+        }
+      }
+    },
+    {
+      "relation": "assigned",
+      "scope": {
+        "fields": {
+          "id": true,
+          "fullName": true
+        }
+      }
+    },
+    {
+      "relation": "createdByUser",
+      "scope": {
+        "fields": {
+          "id": true,
+          "fullName": true,
+          "firstName":true,
+          "lastName":true
+        }
+      }
+    },
+    {
+      "relation": "contact",
+      "scope": {
+        "fields": {
+          "id": true,
+          "firstName": true,
+          'lastName':true,
+          "fullName":true
+        }
+      }
+    },
+    {
+      "relation": "property"
+    }
+  ],
+})
+*/
 
 /*
 import React, { useState } from 'react';

@@ -68,22 +68,18 @@ export default function ScheduleVisitBody({ data, refreshing, loading, onRefresh
                   <Text style={ScheduleVisitStyle.txtHeading}>Visit Type <Text style={ScheduleVisitStyle.txt}>{getKeyByValue(EVisitStatus,item.leadVisitType)}</Text></Text>
                   <Text style={ScheduleVisitStyle.txtHeading}>Visitor<Text style={ScheduleVisitStyle.txt}>{item.contact}</Text></Text>
                   <Text style={ScheduleVisitStyle.txtHeading}>Status:<Text style={ScheduleVisitStyle.txt}>{getKeyByValue(EVisitStatus, item.status)}</Text> </Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Field Officer <Text>{item.assigned.fullName}</Text></Text>
-                  <Text style={ScheduleVisitStyle.txtHeading}>Created By :<Text style={ScheduleVisitStyle.txt}>{item.createdByUser.fullName}</Text> </Text>
+                  <Text style={ScheduleVisitStyle.txtHeading}>Field Officer <Text>{item.assignedTo}</Text></Text>
+                  {/* <Text style={ScheduleVisitStyle.txtHeading}>Created By :<Text style={ScheduleVisitStyle.txt}>{item.assigned.fullName}</Text> </Text> */}
                   <Text style={ScheduleVisitStyle.txtHeading}>Created At:<Text style={ScheduleVisitStyle.txt}>{moment(item.createdAt).format('DD/MM/YYYY, h:mm a')}</Text> </Text>
                 </View>
               )}
             </View>
           ))
-        ) : (<Text style={{ textAlign: 'center', marginTop: 51, fontSize: 25, fontWeight: '500' }}> No Visit Assigned </Text>
+        ) : (<Text style={{ textAlign: 'center', marginTop: '51%', fontSize: 25, fontWeight: '500' }}> No Visit Assigned Today</Text>
         )}
       </ScrollView>
     </View>
   )
 }
-
-
-
-
 
 

@@ -52,7 +52,7 @@ const OTPscreens = ({ route, navigation }) => {
             if (response.status === 200) {
                 const responseData = await response.json();
                 console.log(responseData.message);
-              
+              console.log(responseData)
                 try {          
                     const id = responseData.data.user.id;
                     const token = responseData.data.token;
@@ -63,6 +63,7 @@ const OTPscreens = ({ route, navigation }) => {
                         type: 'success',
                         duration: 5000,
                     });
+                    console.log(data)
                     navigation.navigate('ScheduleVisit', { token: token });
                     
                 } catch (e) {

@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
   
   // Allvisit: API_ENDPOINT_BASE_URL + "/property-schedule",
   ScheduleVisit: API_ENDPOINT_BASE_URL + "/property-schedule/cpvisits",
-  FilterVisitSchedule: API_ENDPOINT_BASE_URL + "/property-schedule?filter=",
+  // FilterVisitSchedule: API_ENDPOINT_BASE_URL + "/property-schedule?filter=",
  
   
   LOGOUT: API_ENDPOINT_BASE_URL + "/v1/api/logout",

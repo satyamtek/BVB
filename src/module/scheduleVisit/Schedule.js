@@ -21,14 +21,16 @@ const ScheduleVisit = ({ navigation }) => {
   const [fromDate, setFromDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDateField, setSelectedDateField] = useState(null);
-console.log('data responce ',data)
+
+  // console.log('data responce ', data)
+
   const radioOptions = [
     { label: 'Accept', value: '1' },
     { label: 'Deny', value: '0' },
   ];
-  const handleRadioSelect = (value) => {
+  const handleRadioSelect = value => {
     setRadioValue(value);
-    // setShowRadioOptions(false);
+    setShowRadioOptions(false);
   };
 
   const handleRadioToggle = () => { setShowRadioOptions(!showRadioOptions); };
@@ -37,9 +39,7 @@ console.log('data responce ',data)
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDateField === 'fromDate') {
       setFromDate(selectedDate || fromDate);
-    } else {
-      setToDate(selectedDate || toDate);
-    }
+    } else {setToDate(selectedDate || toDate)}
   };
 
   const showDatepicker = (field) => {
@@ -50,14 +50,10 @@ console.log('data responce ',data)
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      if (token) {
-        await scheduleAPI(token);
-      }
+      if (token) {await scheduleAPI(token);}
     } catch (error) {
       console.error('Error refreshing data:', error);
-    } finally {
-      setRefreshing(false);
-    }
+    } finally {setRefreshing(false);}
   };
 
   useEffect(() => {
@@ -71,7 +67,7 @@ console.log('data responce ',data)
       } catch (error) { console.error(error); }
     };
     fetchData();
-    const interval = setInterval(fetchData, 900000);
+    const interval = setInterval(fetchData, 40000);
     return () => clearInterval(interval);
   }, []);
 
@@ -151,9 +147,9 @@ console.log('data responce ',data)
       ],
     };
     try {
-      console.log(111,API_ENDPOINTS.ScheduleVisit + JSON.stringify(filter))
-
-      const response = await fetch(API_ENDPOINTS.ScheduleVisit + JSON.stringify(filter), {
+      console.log(API_ENDPOINTS.ScheduleVisit+ JSON.stringify(filter) )
+      const response = await fetch(API_ENDPOINTS.ScheduleVisit+ "?" + JSON.stringify(filter), {
+      // const response = await fetch(API_ENDPOINTS.ScheduleVisit, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + token,
@@ -161,7 +157,7 @@ console.log('data responce ',data)
       });
       const result = await response.json();
       setData(result);
-      console.log("result  \n", result)
+      // console.log("result  \n", result)
     } catch (error) { console.error('Error fetching data:', error); }
     finally { setLoading(false); }
   };
@@ -315,7 +311,7 @@ console.log('data responce ',data)
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={()=>[scheduleAPI, setModalVisible(false)]}>
+                  onPress={() => [scheduleAPI, setModalVisible(false)]}>
                   {/* onPress={() => setModalVisible(!modalVisible)}> */}
                   <Text style={styles.textStyle}>Submit</Text>
                 </Pressable>
@@ -328,11 +324,11 @@ console.log('data responce ',data)
             </View>
           </View>
         </Modal>
-        <Pressable
+        {/* <Pressable
           style={[styles.button, styles.buttonOpen]}
           onPress={() => setModalVisible(true)}>
           <Icon name="filter" size={60} color="#ff80d5" />
-        </Pressable>
+        </Pressable> */}
       </View>
 
       <ScheduleVisitBody data={data} loading={loading} refreshing={refreshing} onRefresh={onRefresh} />
